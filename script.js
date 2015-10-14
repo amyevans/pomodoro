@@ -6,43 +6,55 @@ $(document).ready(function() {
 		$clock = $('.clock'),
 		$countdown = $('#countdown'),
 		intervalID,
-		time = 1500, // 25 minute default, 25 * 60 = 1500
+		sessionTime = 1500, // 25 minute default, 25 * 60 = 1500
+		inSession = 1,
 		formattedTime = '';
 
 
 	// add time to session on click
 	$addSession.on('click', function () {
-		time += 60;
-		displayTime();
+		sessionTime += 60;
+		displayTime(sessionTime);
 	});
 
 	// subtract time from session on click
 	$subtractSession.on('click', function () {
-		time -= 60;
-		displayTime();
+		sessionTime -= 60;
+		if (sessionTime < 0) { sessionTime = 0; }
+		displayTime(sessionTime);
 	});
 
 	// if you click on the clock face, it sets the interval
 	$clock.on('click', function () {
-		if (!intervalID) {
-			// every 1000 milliseconds (1 sec), updateCountdown() is called
-			intervalID = setInterval(updateCountdown, 1000);
-		// pause the timer if it's clicked while running
+		// first check to see if in a Session or a Break
+		if (inSession) {
+			if (!intervalID) {
+				// every 1000 milliseconds (1 sec), updateCountdown() is called
+				intervalID = setInterval(updateCountdown, 1000);
+			// pause the timer if it's clicked while running
+			} else {
+				clearInterval(intervalID);
+				intervalID = 0;
+			}
 		} else {
-			clearInterval(intervalID);
-			intervalID = 0;
+			console.log('Currently in Break');
 		}
 	});
 
 	function updateCountdown() {
-		if (time <= 0) {
+		sessionTime -= 1;
+
+		if (sessionTime <= 0) {
+			sessionTime = 0;
 			clearInterval(intervalID);
+			// TO DO: switch to break here
+			// maybe something like runBreak();
 		}
-		time -= 1;
-		displayTime();
+		
+		displayTime(sessionTime);
 	}
 
-	function displayTime() {
+	function displayTime(time) {
 		formattedTime = formatTime(time);
 		$countdown.html(formattedTime);
 	}
