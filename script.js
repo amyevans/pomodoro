@@ -5,53 +5,115 @@ $(document).ready(function() {
 		$addSession = $('#addSession'),
 		$clock = $('.clock'),
 		$countdown = $('#countdown'),
-		intervalID,
-		sessionTime = 1500, // 25 minute default, 25 * 60 = 1500
-		inSession = 1,
+		sessionID,
+		originalSession = +$('#sessionMin').html(),
+		currentSession = originalSession * 60, // convert to seconds
+		breakID,
+		originalBreak = +$('#breakMin').html(),
+		currentBreak = originalBreak * 60, // convert to seconds
 		formattedTime = '';
-
 
 	// add time to session on click
 	$addSession.on('click', function () {
-		sessionTime += 60;
-		displayTime(sessionTime);
+		originalSession += 1;
+		$('#sessionMin').html(originalSession);
+		currentSession = originalSession * 60;
+		displayTime(currentSession);
 	});
 
 	// subtract time from session on click
 	$subtractSession.on('click', function () {
-		sessionTime -= 60;
-		if (sessionTime < 0) { sessionTime = 0; }
-		displayTime(sessionTime);
+		// doesn't make sense to allow 0 time or negative time
+		if (originalSession > 1) {
+		originalSession -= 1;
+		}
+		$('#sessionMin').html(originalSession);
+		currentSession = originalSession * 60;
+		displayTime(currentSession);
+	});
+
+	// add time to break on click
+	$addBreak.on('click', function () {
+		originalBreak += 1;
+		$('#breakMin').html(originalBreak);
+		currentBreak = originalBreak * 60;
+		if ($('#clockTitle').html() === 'Break!') {
+			displayTime(currentBreak);
+		}
+	});
+
+	// subtract time from break on click
+	$subtractBreak.on('click', function () {
+		// doesn't make sense to allow 0 time or negative time
+		if (originalBreak > 1) {
+			originalBreak -= 1;
+		}
+		$('#breakMin').html(originalBreak);
+		currentBreak = originalBreak * 60;
+		if ($('#clockTitle').html() === 'Break!') {
+			displayTime(currentBreak);
+		}
 	});
 
 	// if you click on the clock face, it sets the interval
 	$clock.on('click', function () {
 		// first check to see if in a Session or a Break
-		if (inSession) {
-			if (!intervalID) {
-				// every 1000 milliseconds (1 sec), updateCountdown() is called
-				intervalID = setInterval(updateCountdown, 1000);
+		if ($('#clockTitle').html() === 'Session') {
+			if (!sessionID) {
+				runSession();
 			// pause the timer if it's clicked while running
 			} else {
-				clearInterval(intervalID);
-				intervalID = 0;
+				clearInterval(sessionID);
+				sessionID = 0;
 			}
-		} else {
-			console.log('Currently in Break');
+		} else { // ie, in Break
+			if (!breakID) {
+				runBreak();
+			// pause the timer if it's clicked while running
+			} else {
+				clearInterval(breakID);
+				breakID = 0;
+			}
 		}
 	});
 
-	function updateCountdown() {
-		sessionTime -= 1;
+	function runSession() {
+		$('#clockTitle').html('Session');
+		// every 1000 milliseconds (1 sec), updateSession() is called
+		sessionID = setInterval(updateSession, 1000);
+	}
 
-		if (sessionTime <= 0) {
-			sessionTime = 0;
-			clearInterval(intervalID);
-			// TO DO: switch to break here
-			// maybe something like runBreak();
+	function updateSession() {
+		currentSession -= 1;
+		displayTime(currentSession);
+		if (currentSession === 0) {
+			resetTimer();
+			runBreak();
 		}
-		
-		displayTime(sessionTime);
+	}
+
+	function runBreak() {
+		$('#clockTitle').html('Break!');
+		// every 1000 milliseconds (1 sec), updateBreak() is called
+		breakID = setInterval(updateBreak, 1000);
+	}
+
+	function updateBreak() {
+		currentBreak -= 1;
+		displayTime(currentBreak);
+		if (currentBreak === 0) {
+			resetTimer();
+			runSession();
+		}
+	}
+
+	function resetTimer() {
+		clearInterval(sessionID);
+		sessionID = 0;
+		clearInterval(breakID);
+		breakID = 0;
+		currentSession = originalSession * 60;
+		currentBreak = originalBreak * 60;
 	}
 
 	function displayTime(time) {
