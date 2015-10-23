@@ -79,31 +79,35 @@ $(document).ready(function() {
 
 	function runSession() {
 		$('#clockTitle').html('Session');
+		displayTime(currentSession);
 		// every 1000 milliseconds (1 sec), updateSession() is called
 		sessionID = setInterval(updateSession, 1000);
 	}
 
 	function updateSession() {
-		currentSession -= 1;
-		displayTime(currentSession);
 		if (currentSession === 0) {
 			resetTimer();
 			runBreak();
+		} else {
+			currentSession -= 1;
+			displayTime(currentSession);
 		}
 	}
 
 	function runBreak() {
 		$('#clockTitle').html('Break!');
+		displayTime(currentBreak);
 		// every 1000 milliseconds (1 sec), updateBreak() is called
 		breakID = setInterval(updateBreak, 1000);
 	}
 
 	function updateBreak() {
-		currentBreak -= 1;
-		displayTime(currentBreak);
 		if (currentBreak === 0) {
 			resetTimer();
 			runSession();
+		} else {
+			currentBreak -= 1;
+			displayTime(currentBreak);
 		}
 	}
 
