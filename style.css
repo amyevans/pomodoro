@@ -53,6 +53,18 @@ body {
 	font-family: 'Lato', sans-serif;
 	background-color: #1F2421;
 	color: #DCE1DE;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#subtractBreak, #addBreak,
+#subtractSession, #addSession,
+.clock {
+	cursor: pointer;
 }
 
 h1 {
@@ -91,6 +103,7 @@ div.clock {
 	width: 300px;
 	height: 300px;
 	margin: 0 auto;
+	padding: 0;
 }
 
 .clockContent {
