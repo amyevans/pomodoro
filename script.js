@@ -11,7 +11,8 @@ $(document).ready(function() {
 		breakID,
 		originalBreak = +$('#breakMin').html(),
 		currentBreak = originalBreak * 60, // convert to seconds
-		formattedTime = '';
+		formattedTime = '',
+		audio = new Audio('chime.mp3');
 
 	// add time to session on click
 	$addSession.on('click', function () {
@@ -112,6 +113,7 @@ $(document).ready(function() {
 	}
 
 	function resetTimer() {
+		audio.play();
 		clearInterval(sessionID);
 		sessionID = 0;
 		clearInterval(breakID);
